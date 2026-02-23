@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Strategy Day | Who Wins?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d0f14;
+            --bg-secondary: #141721;
+            --bg-card: #1a1e2e;
+            --bg-hover: #232840;
+            --border: #2a2f45;
+            --text-primary: #ffffff;
+            --text-secondary: #8b8fa3;
+            --text-muted: #5d6177;
+            --accent-green: #00d26a;
+            --accent-green-dim: rgba(0, 210, 106, 0.15);
+            --accent-red: #ff4757;
+            --accent-red-dim: rgba(255, 71, 87, 0.15);
+            --accent-blue: #4a9eff;
+            --accent-purple: #a855f7;
+            --accent-gold: #fbbf24;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-logo {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 14px;
+        }
+
+        .navbar-title {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+        }
+
+        .navbar-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .navbar-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .navbar-stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Live badge */
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--accent-red);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        /* Main content */
+        .main-content {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 32px 20px;
+        }
+
+        /* Market header */
+        .market-header {
+            margin-bottom: 32px;
+        }
+
+        .market-category {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .market-title {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .market-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .market-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Volume bar */
+        .volume-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .volume-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .volume-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .volume-change {
+            font-size: 12px;
+            color: var(--accent-green);
+            background: var(--accent-green-dim);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Chart placeholder */
+        .chart-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 20px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .chart-timeframes {
+            display: flex;
+            gap: 4px;
+        }
+
+        .chart-tf {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .chart-tf.active {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 160px;
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Options section */
+        .options-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .options-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .options-sort {
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        /* Option cards */
+        .option-card {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-hover);
+            transform: translateY(-1px);
+        }
+
+        .option-card:active {
+            transform: translateY(0);
+        }
+
+        .option-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .option-rank.rank-1 {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.05));
+            color: var(--accent-gold);
+        }
+
+        .option-rank.rank-2 {
+            background: rgba(139, 143, 163, 0.15);
+            color: var(--text-secondary);
+        }
+
+        .option-rank.rank-3 {
+            background: rgba(139, 143, 163, 0.1);
+            color: var(--text-muted);
+        }
+
+        .option-rank.rank-4 {
+            background: rgba(139, 143, 163, 0.08);
+            color: var(--text-muted);
+        }
+
+        .option-info {
+            flex: 1;
+        }
+
+        .option-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .option-name .hot-tag {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--accent-red);
+        }
+
+        .option-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .option-odds {
+            text-align: right;
+            margin-left: 16px;
+        }
+
+        .option-pct {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .option-pct.green { color: var(--accent-green); }
+        .option-pct.blue { color: var(--accent-blue); }
+        .option-pct.muted { color: var(--text-muted); }
+
+        .option-trend {
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .option-trend.up { color: var(--accent-green); }
+        .option-trend.down { color: var(--accent-red); }
+
+        .option-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            border-radius: 0 3px 0 0;
+            transition: width 0.5s ease;
+        }
+
+        .option-bar.green { background: var(--accent-green); }
+        .option-bar.blue { background: var(--accent-blue); }
+        .option-bar.muted { background: var(--text-muted); opacity: 0.3; }
+
+        /* Bet button */
+        .option-bet-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            margin-left: 12px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        .option-bet-btn.yes {
+            background: var(--accent-green-dim);
+            color: var(--accent-green);
+        }
+
+        .option-bet-btn.yes:hover {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        /* Footer stats */
+        .footer-stats {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            padding: 16px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-stat {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .footer-stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .footer-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 11px;
+            margin-top: 32px;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        /* ============ RESULT OVERLAY ============ */
+        .result-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .result-overlay.show {
+            display: flex;
+        }
+
+        .result-overlay.correct {
+            background: radial-gradient(ellipse at center, #0a2e1a 0%, #0d0f14 70%);
+        }
+
+        .result-overlay.wrong {
+            background: radial-gradient(ellipse at center, #2e0a0a 0%, #0d0f14 70%);
+        }
+
+        .result-content {
+            text-align: center;
+            z-index: 10;
+            animation: resultSlam 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes resultSlam {
+            0% { transform: scale(3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .result-emoji {
+            font-size: 80px;
+            margin-bottom: 16px;
+            animation: emojiFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes emojiFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .result-title {
+            font-size: 72px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 12px;
+        }
+
+        .result-title.correct { color: var(--accent-green); }
+        .result-title.wrong { color: var(--accent-red); }
+
+        .result-subtitle {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .result-detail {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 400px;
+            margin: 0 auto 32px;
+            line-height: 1.5;
+        }
+
+        .result-btn {
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .result-btn.correct {
+            background: var(--accent-green);
+            color: #000;
+        }
+
+        .result-btn.wrong {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .result-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Wrong screen specifics */
+        .wrong-section-name {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--accent-red);
+            opacity: 0.3;
+            text-decoration: line-through;
+            margin-bottom: 8px;
+        }
+
+        .wrong-correction {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 24px;
+        }
+
+        /* Confetti canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* Shaking animation for wrong answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+
+        .shake {
+            animation: shake 0.6s ease-in-out;
+        }
+
+        /* Glitch text for wrong answer */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 red, -2px 0 blue; }
+            25% { text-shadow: -2px 0 red, 2px 0 blue; }
+            50% { text-shadow: 2px 2px red, -2px -2px blue; }
+            75% { text-shadow: -2px 2px red, 2px -2px blue; }
+            100% { text-shadow: 2px 0 red, -2px 0 blue; }
+        }
+
+        .glitch {
+            animation: glitch 0.3s ease-in-out infinite;
+        }
+
+        /* Correct screen extras */
+        .e6-hero {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-gold), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 2s ease-in-out infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .trophy-rain {
+            position: fixed;
+            font-size: 40px;
+            animation: fall linear forwards;
+            z-index: 998;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Share section on correct page */
+        .share-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .share-text {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #25d366;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.05);
+            background: #20bd5a;
+        }
+
+        /* Mobile */
+        @media (max-width: 640px) {
+            .navbar-stats { display: none; }
+            .market-title { font-size: 24px; }
+            .result-title { font-size: 48px; }
+            .e6-hero { font-size: 80px; }
+            .option-card { padding: 12px 16px; }
+            .option-pct { font-size: 18px; }
+            .footer-stats { flex-wrap: wrap; }
+            .footer-stat { min-width: calc(50% - 6px); }
+        }
+
+        /* Smooth entrance */
+        .option-card {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        .option-card:nth-child(1) { animation-delay: 0.1s; }
+        .option-card:nth-child(2) { animation-delay: 0.2s; }
+        .option-card:nth-child(3) { animation-delay: 0.3s; }
+        .option-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Fake live ticker */
+        .ticker {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 6px 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .ticker-content {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .ticker-content span {
+            margin-right: 40px;
+        }
+
+        .ticker-highlight {
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ticker -->
+    <div class="ticker">
+        <div class="ticker-content">
+            <span>E6 odds surging <span class="ticker-highlight">+12.4%</span></span>
+            <span>&#x1f4ca; 2,847 predictions placed</span>
+            <span>E7 momentum stalling after weak Q3 case analysis</span>
+            <span>BREAKING: E6 insider confidence at all-time high <span class="ticker-highlight">&#x1f525;</span></span>
+            <span>E8 reportedly "nervous" ahead of final presentations</span>
+            <span>E9 strategy described as "ambitious but flawed" by sources</span>
+            <span>&#x1f3c6; Market closes at 18:00 CET today</span>
+            <span>E6 supporters report "unprecedented team chemistry"</span>
+            <span>E6 odds surging <span class="ticker-highlight">+12.4%</span></span>
+            <span>&#x1f4ca; 2,847 predictions placed</span>
+            <span>E7 momentum stalling after weak Q3 case analysis</span>
+            <span>BREAKING: E6 insider confidence at all-time high <span class="ticker-highlight">&#x1f525;</span></span>
+            <span>E8 reportedly "nervous" ahead of final presentations</span>
+            <span>E9 strategy described as "ambitious but flawed" by sources</span>
+            <span>&#x1f3c6; Market closes at 18:00 CET today</span>
+            <span>E6 supporters report "unprecedented team chemistry"</span>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-logo">S</div>
+            <div>
+                <div class="navbar-title">StratMarket</div>
+                <div class="navbar-subtitle">INSEAD Prediction Markets</div>
+            </div>
+        </div>
+        <div class="navbar-stats">
+            <div class="market-meta-item">
+                <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+            </div>
+            <div>
+                <span style="color: var(--text-muted)">Volume</span>
+                <span class="navbar-stat-value">&#x20ac;48.2k</span>
+            </div>
+            <div>
+                <span style="color: var(--text-muted)">Traders</span>
+                <span class="navbar-stat-value">1,247</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Market Header -->
+        <div class="market-header">
+            <div class="market-category">
+                &#x1f3db;&#xfe0f; INSEAD &middot; Master Strategy Day &middot; P2 2026
+            </div>
+            <h1 class="market-title">Who will win Master Strategy Day?</h1>
+            <div class="market-meta">
+                <div class="market-meta-item">&#x1f4c5; Resolves today</div>
+                <div class="market-meta-item">&#x1f465; 1,247 predictors</div>
+                <div class="market-meta-item">&#x1f4b0; &#x20ac;48,219 volume</div>
+            </div>
+        </div>
+
+        <!-- Volume bar -->
+        <div class="volume-bar">
+            <div>
+                <div class="volume-label">24h Volume</div>
+                <div class="volume-amount">&#x20ac;12,450</div>
+            </div>
+            <div class="volume-change">&#x2191; 34% from yesterday</div>
+        </div>
+
+        <!-- Fake chart -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div class="chart-title">E6 Win Probability</div>
+                <div class="chart-timeframes">
+                    <button class="chart-tf">1H</button>
+                    <button class="chart-tf">6H</button>
+                    <button class="chart-tf active">1D</button>
+                    <button class="chart-tf">ALL</button>
+                </div>
+            </div>
+            <div class="chart-canvas">
+                <svg class="chart-svg" viewBox="0 0 680 160" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgba(0,210,106,0.3)"/>
+                            <stop offset="100%" stop-color="rgba(0,210,106,0)"/>
+                        </linearGradient>
+                    </defs>
+                    <!-- Area fill -->
+                    <path d="M0,120 C40,115 80,110 120,100 C160,90 200,95 240,80 C280,65 320,70 360,55 C400,40 440,45 480,35 C520,25 560,30 600,20 C640,15 660,10 680,8 L680,160 L0,160 Z"
+                          fill="url(#chartGrad)"/>
+                    <!-- Line -->
+                    <path d="M0,120 C40,115 80,110 120,100 C160,90 200,95 240,80 C280,65 320,70 360,55 C400,40 440,45 480,35 C520,25 560,30 600,20 C640,15 660,10 680,8"
+                          fill="none" stroke="var(--accent-green)" stroke-width="2.5"/>
+                    <!-- Current price dot -->
+                    <circle cx="680" cy="8" r="4" fill="var(--accent-green)">
+                        <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Options -->
+        <div class="options-header">
+            <div class="options-title">Cast your prediction</div>
+            <div class="options-sort">Sorted by probability &#x25BE;</div>
+        </div>
+
+        <div id="optionsContainer">
+            <div class="option-card" onclick="selectOption('E6')">
+                <div class="option-rank rank-1">1</div>
+                <div class="option-info">
+                    <div class="option-name">Section E6 <span class="hot-tag">&#x1f525; HOT</span></div>
+                    <div class="option-subtitle">847 predictions &middot; 67% buy pressure</div>
+                </div>
+                <div class="option-odds">
+                    <div class="option-pct green">73%</div>
+                    <div class="option-trend up">&#x25B2; 12.4% today</div>
+                </div>
+                <button class="option-bet-btn yes">Predict</button>
+                <div class="option-bar green" style="width: 73%"></div>
+            </div>
+
+            <div class="option-card" onclick="selectOption('E7')">
+                <div class="option-rank rank-2">2</div>
+                <div class="option-info">
+                    <div class="option-name">Section E7</div>
+                    <div class="option-subtitle">312 predictions &middot; 41% buy pressure</div>
+                </div>
+                <div class="option-odds">
+                    <div class="option-pct blue">14%</div>
+                    <div class="option-trend down">&#x25BC; 3.1% today</div>
+                </div>
+                <button class="option-bet-btn yes">Predict</button>
+                <div class="option-bar blue" style="width: 14%"></div>
+            </div>
+
+            <div class="option-card" onclick="selectOption('E8')">
+                <div class="option-rank rank-3">3</div>
+                <div class="option-info">
+                    <div class="option-name">Section E8</div>
+                    <div class="option-subtitle">156 predictions &middot; 29% buy pressure</div>
+                </div>
+                <div class="option-odds">
+                    <div class="option-pct muted">8%</div>
+                    <div class="option-trend down">&#x25BC; 5.7% today</div>
+                </div>
+                <button class="option-bet-btn yes">Predict</button>
+                <div class="option-bar muted" style="width: 8%"></div>
+            </div>
+
+            <div class="option-card" onclick="selectOption('E9')">
+                <div class="option-rank rank-4">4</div>
+                <div class="option-info">
+                    <div class="option-name">Section E9</div>
+                    <div class="option-subtitle">89 predictions &middot; 18% buy pressure</div>
+                </div>
+                <div class="option-odds">
+                    <div class="option-pct muted">5%</div>
+                    <div class="option-trend down">&#x25BC; 8.2% today</div>
+                </div>
+                <button class="option-bet-btn yes">Predict</button>
+                <div class="option-bar muted" style="width: 5%"></div>
+            </div>
+        </div>
+
+        <!-- Footer stats -->
+        <div class="footer-stats">
+            <div class="footer-stat">
+                <div class="footer-stat-value">2,847</div>
+                <div class="footer-stat-label">Total Predictions</div>
+            </div>
+            <div class="footer-stat">
+                <div class="footer-stat-value">&#x20ac;48.2k</div>
+                <div class="footer-stat-label">Volume</div>
+            </div>
+            <div class="footer-stat">
+                <div class="footer-stat-value">73%</div>
+                <div class="footer-stat-label">E6 Consensus</div>
+            </div>
+            <div class="footer-stat">
+                <div class="footer-stat-value">4h 12m</div>
+                <div class="footer-stat-label">Until Close</div>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            StratMarket is not a real prediction market. No actual money is involved.<br>
+            This is for entertainment purposes only. But seriously, E6 is going to win.<br>
+            <span style="color: var(--text-muted); opacity: 0.5;">Built with vibes &middot; INSEAD MBA 26J</span>
+        </div>
+    </div>
+
+    <!-- CORRECT overlay -->
+    <div class="result-overlay correct" id="correctOverlay">
+        <canvas id="confetti-canvas"></canvas>
+        <div class="result-content">
+            <div class="e6-hero">E6</div>
+            <div class="result-title correct">CORRECT!</div>
+            <div class="result-subtitle">Obviously.</div>
+            <div class="result-detail">
+                Was there ever any doubt? The data doesn't lie. The market doesn't lie. E6 is simply built different.
+            </div>
+            <button class="result-btn correct" onclick="resetGame()">&#x1f3c6; Predict Again</button>
+            <div class="share-section">
+                <div class="share-text">Share with the group chat</div>
+                <button class="share-btn" onclick="shareWhatsApp()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    Share on WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WRONG overlay -->
+    <div class="result-overlay wrong" id="wrongOverlay">
+        <div class="result-content shake">
+            <div class="result-emoji">&#x1f6a8;</div>
+            <div class="wrong-section-name" id="wrongSectionName"></div>
+            <div class="result-title wrong glitch">WRONG</div>
+            <div class="result-subtitle" id="wrongSubtitle"></div>
+            <div class="result-detail" id="wrongDetail"></div>
+            <div class="wrong-correction">The answer is E6. It's always E6.</div>
+            <button class="result-btn wrong" onclick="resetGame()">Try Again (Pick E6 This Time)</button>
+        </div>
+    </div>
+
+    <script>
+        // Wrong answer roasts
+        const roasts = {
+            'E7': {
+                subtitle: 'Really? E7?',
+                detail: 'The algorithm has flagged your prediction as "statistically embarrassing". E7 has a 14% chance and that\'s generous. Our models actually rounded up from 3% out of pity.'
+            },
+            'E8': {
+                subtitle: 'E8? Bold choice.',
+                detail: 'Bold in the same way that bringing a knife to a gunfight is bold. E8\'s strategy was described by one anonymous judge as "interesting" — and we all know what that means.'
+            },
+            'E9': {
+                subtitle: 'You picked... E9?',
+                detail: 'E9 is currently polling behind "none of the above" and "my dog could do better". We\'re not saying it\'s impossible, we\'re just saying our model gives it the same odds as finding a parking spot at Fonty.'
+            }
+        };
+
+        function selectOption(section) {
+            if (section === 'E6') {
+                showCorrect();
+            } else {
+                showWrong(section);
+            }
+        }
+
+        function showCorrect() {
+            const overlay = document.getElementById('correctOverlay');
+            overlay.classList.add('show');
+            startConfetti();
+            startTrophyRain();
+            // Haptic feedback on mobile
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+        }
+
+        function showWrong(section) {
+            const overlay = document.getElementById('wrongOverlay');
+            const roast = roasts[section];
+
+            document.getElementById('wrongSectionName').textContent = section;
+            document.getElementById('wrongSubtitle').textContent = roast.subtitle;
+            document.getElementById('wrongDetail').textContent = roast.detail;
+
+            overlay.classList.add('show');
+
+            // Shake the whole page first
+            document.body.classList.add('shake');
+            setTimeout(() => document.body.classList.remove('shake'), 600);
+
+            // Vibrate on mobile
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+        }
+
+        function resetGame() {
+            document.getElementById('correctOverlay').classList.remove('show');
+            document.getElementById('wrongOverlay').classList.remove('show');
+
+            // Clear confetti
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            confettiRunning = false;
+
+            // Clear trophy rain
+            document.querySelectorAll('.trophy-rain').forEach(el => el.remove());
+        }
+
+        // ============ CONFETTI ENGINE ============
+        let confettiRunning = false;
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+
+            confettiRunning = true;
+            const particles = [];
+            const colors = ['#00d26a', '#fbbf24', '#4a9eff', '#a855f7', '#ff4757', '#ffffff'];
+
+            for (let i = 0; i < 200; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    w: Math.random() * 10 + 5,
+                    h: Math.random() * 6 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 4 + 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10,
+                    opacity: 1
+                });
+            }
+
+            function animate() {
+                if (!confettiRunning) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                let active = false;
+                particles.forEach(p => {
+                    if (p.y < canvas.height + 50) {
+                        active = true;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.05;
+                        p.rotation += p.rotationSpeed;
+                        p.vx *= 0.99;
+
+                        if (p.y > canvas.height - 100) {
+                            p.opacity -= 0.02;
+                        }
+
+                        ctx.save();
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.globalAlpha = Math.max(0, p.opacity);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+                        ctx.restore();
+                    }
+                });
+
+                if (active) requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            // Second burst after 500ms
+            setTimeout(() => {
+                for (let i = 0; i < 100; i++) {
+                    particles.push({
+                        x: canvas.width / 2 + (Math.random() - 0.5) * 200,
+                        y: canvas.height / 2,
+                        w: Math.random() * 10 + 5,
+                        h: Math.random() * 6 + 3,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        vx: (Math.random() - 0.5) * 12,
+                        vy: (Math.random() - 0.5) * 12,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: (Math.random() - 0.5) * 15,
+                        opacity: 1
+                    });
+                }
+                animate();
+            }, 500);
+        }
+
+        function startTrophyRain() {
+            const emojis = ['&#x1f3c6;', '&#x1f947;', '&#x2b50;', '&#x1f451;', '&#x1f389;', '&#x1f38a;'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    if (!confettiRunning) return;
+                    const el = document.createElement('div');
+                    el.className = 'trophy-rain';
+                    el.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                    el.style.left = Math.random() * 100 + 'vw';
+                    el.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 5000);
+                }, i * 200);
+            }
+        }
+
+        // ============ WHATSAPP SHARE ============
+        function shareWhatsApp() {
+            const url = window.location.href;
+            const text = '&#x1f3c6; I just predicted E6 to win Master Strategy Day and the market agrees (73% probability). Cast your prediction: ' + url;
+            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+        }
+
+        // ============ FAKE LIVE UPDATES ============
+        function fakeOddsUpdate() {
+            const e6Pct = document.querySelector('.option-card:nth-child(1) .option-pct');
+            const current = parseFloat(e6Pct.textContent);
+            const change = (Math.random() - 0.3) * 0.5; // Biased upward
+            const newVal = Math.min(89, Math.max(65, current + change));
+            e6Pct.textContent = newVal.toFixed(0) + '%';
+        }
+
+        setInterval(fakeOddsUpdate, 3000);
+
+        // Countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const end = new Date(now);
+            end.setHours(18, 0, 0, 0);
+            if (now > end) end.setDate(end.getDate() + 1);
+
+            const diff = end - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+
+            const countdownEl = document.querySelector('.footer-stat:last-child .footer-stat-value');
+            if (countdownEl) countdownEl.textContent = h + 'h ' + m + 'm';
+        }
+
+        setInterval(updateCountdown, 60000);
+        updateCountdown();
+    </script>
+</body>
+</html>
